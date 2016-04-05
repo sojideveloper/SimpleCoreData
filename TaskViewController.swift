@@ -22,18 +22,18 @@ class TaskViewController: UIViewController {
         super.viewDidLoad()
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(TaskViewController.addTask))
+
     }
     
     override func viewWillAppear(animated: Bool) {
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext
+        let appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        let context = appDel.managedObjectContext
         
-        let fetchRequest = NSFetchRequest(entityName: entityName)
+        let request = NSFetchRequest(entityName: entityName)
         
         do {
-            let results = try managedContext.executeFetchRequest(fetchRequest) as! [NSManagedObject]
-            taskList = results as! [NSManagedObject]
-            
+            let results = try context.executeFetchRequest(request) as! [NSManagedObject]
+            taskList = results 
         } catch {
             print("Could not execute fetch request:")
         }
@@ -60,14 +60,12 @@ class TaskViewController: UIViewController {
         
         self.presentViewController(alert, animated: true, completion: nil)
     }
-    
-    
-    
+
     func saveTask(taskToSave: String) {
         let appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         let context = appDel.managedObjectContext
         let entityDescription = NSEntityDescription.entityForName(entityName, inManagedObjectContext: context)
-        let taskDescription = NSManagedObject(entity: entityDescription!, insertIntoManagedObjectContext: context) as! NSManagedObject
+        let taskDescription = NSManagedObject(entity: entityDescription!, insertIntoManagedObjectContext: context) 
         
         taskDescription.setValue(taskToSave, forKey: attributeKey)
         
@@ -95,8 +93,30 @@ extension TaskViewController: UITableViewDataSource {
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == .Delete {
+            
+            let appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+            let context = appDel.managedObjectContext
+            let request = NSFetchRequest(entityName: entityName)
+            
+            do {
+                let results = try context.executeFetchRequest(request) as! [NSManagedObject]
+                
+                context.deleteObject(results[indexPath.row])
+                taskList.removeAtIndex(indexPath.row)
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
+                
+            } catch {
+                print("Could not delete item(s)")
+            }
+            
+            do {
+                try context.save()
+            } catch {
+                print("Could not save records after deletion")
+            }
+        }
     }
 }
 
