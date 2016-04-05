@@ -8,7 +8,7 @@
         <!--Tasks-->
         <scene sceneID="1Mq-8g-igo">
             <objects>
-                <viewController id="0w0-KN-UwX" sceneMemberID="viewController">
+                <viewController id="0w0-KN-UwX" customClass="TaskViewController" customModule="SimpleCoreData" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="itE-9g-e2p"/>
                         <viewControllerLayoutGuide type="bottom" id="fij-HP-LFd"/>
@@ -21,7 +21,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="nZC-2Y-i3s">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="nZC-2Y-i3s" customClass="TaskTableViewCell" customModule="SimpleCoreData" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="92" width="600" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nZC-2Y-i3s" id="1Z7-eB-fDo">
@@ -45,6 +45,9 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Tasks" id="wcs-Ae-MXY"/>
+                    <connections>
+                        <outlet property="tableView" destination="RIe-WP-yE3" id="qil-Q3-yO5"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c6A-sx-204" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

@@ -12,23 +12,39 @@ import CoreData
 class TaskViewController: UIViewController {
     
     let entityName = "Tasks"
+    let attributeKey = "taskDescription"
+    
     var taskList = [NSManagedObject]()
-    var tempArray = ["Run", "Eat", "Shop", "Sleep", "Read"]
     
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: Selector("addTask"))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(TaskViewController.addTask))
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext
+        
+        let fetchRequest = NSFetchRequest(entityName: entityName)
+        
+        do {
+            let results = try managedContext.executeFetchRequest(fetchRequest) as! [NSManagedObject]
+            taskList = results as! [NSManagedObject]
+            
+        } catch {
+            print("Could not execute fetch request:")
+        }
     }
     
     func addTask() {
         let alert = UIAlertController(title: "Add a new task", message: "Enter the new task description below", preferredStyle: .Alert)
         
-        let confirmAction = UIAlertAction(title: "Add", style: .Default) { (_) in
+        let saveAction = UIAlertAction(title: "Add", style: .Default) { (_) in
             if let alertTextField = alert.textFields![0] as? UITextField {
-                self.savetask(alertTextField.text!)
+                self.saveTask(alertTextField.text!)
                 self.tableView.reloadData()
             }
         }
@@ -39,20 +55,25 @@ class TaskViewController: UIViewController {
             textField.placeholder = "Enter task description..."
         }
         
-        alert.addAction(confirmAction)
+        alert.addAction(saveAction)
         alert.addAction(cancelAction)
         
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
-    func savetask(taskToSave: String) {
+    
+    
+    func saveTask(taskToSave: String) {
         let appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         let context = appDel.managedObjectContext
         let entityDescription = NSEntityDescription.entityForName(entityName, inManagedObjectContext: context)
-        let taskDescription = NSManagedObject(entity: entityDescription!, insertIntoManagedObjectContext: context)
+        let taskDescription = NSManagedObject(entity: entityDescription!, insertIntoManagedObjectContext: context) as! NSManagedObject
+        
+        taskDescription.setValue(taskToSave, forKey: attributeKey)
         
         do {
             try context.save()
+            taskList.append(taskDescription)
         } catch {
             print("Error: Could not save new task")
         }
@@ -67,11 +88,16 @@ extension TaskViewController: UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! TaskTableViewCell
+        let task = taskList[indexPath.row]
+        cell.textLabel!.text = task.valueForKey(attributeKey) as? String
         
         return cell
     }
     
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+    }
 }
 
 extension TaskViewController: UITableViewDelegate {

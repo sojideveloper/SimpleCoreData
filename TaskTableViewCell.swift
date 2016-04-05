@@ -10,6 +10,10 @@ import UIKit
 
 class TaskTableViewCell: UITableViewCell {
     
-    
+    var taskDescription: String = "" {
+        willSet(taskDescription) {
+            self.textLabel?.text = taskDescription
+        }
+    }
     
 }
